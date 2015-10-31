@@ -94,7 +94,6 @@ def rfAvgAcc(rfModel, XTest, yTest):
 
     plt.figure(figsize=(10, 5))
     plt.plot(avgPred,  '.', linestyle='-', color='c')
-    plt.ylim(0.8,0.95)
     plt.xlabel("Number of trees")
     plt.ylabel("Accuracy")
     plt.grid()
