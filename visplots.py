@@ -6,7 +6,7 @@ from sklearn import metrics
 import numpy as np
 
 
-def knnDecisionPlot(XTrain, yTrain, XTest, yTest, n_neighbors, weights):
+def knnDecisionPlot(XTrain, yTrain, XTest, yTest, n_neighbors, weights = "uniform"):
     plt.figure(figsize=(7,5))
     h = .02  # step size in the mesh
     Xtrain = XTrain[:, :2] # we only take the first two features.
@@ -94,6 +94,7 @@ def rfAvgAcc(rfModel, XTest, yTest):
 
     plt.figure(figsize=(10, 5))
     plt.plot(avgPred,  '.', linestyle='-', color='c')
+    plt.ylim(min(avgPred)-0.04, max(avgPred)+0.04)
     plt.xlabel("Number of trees")
     plt.ylabel("Accuracy")
     plt.grid()
