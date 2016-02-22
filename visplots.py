@@ -1,72 +1,346 @@
-import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
+import numpy as np
+import plotly.graph_objs as go
+
+from plotly.graph_objs import *
+from plotly.offline import download_plotlyjs, init_notebook_mode, iplot
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
-import numpy as np
 
 
-def knnDecisionPlot(XTrain, yTrain, XTest, yTest, n_neighbors, weights = "uniform"):
-    plt.figure(figsize=(7,5))
+def knnDecisionPlot(XTrain, yTrain, XTest, yTest, header, n_neighbors, weights = "uniform"):
+    Xtrain = XTrain[:, :2]
     h = .02  # step size in the mesh
-    Xtrain = XTrain[:, :2] # we only take the first two features.
 
-    # Create color maps
-    cmap_light = ListedColormap(["#AAAAFF", "#AAFFAA", "#FFAAAA"])
-    cmap_bold  = ListedColormap(["#0000FF", "#00FF00", "#FF0000"])
-
-    clf = KNeighborsClassifier(n_neighbors, weights=weights)
+    clf = KNeighborsClassifier(n_neighbors, weights)
     clf.fit(Xtrain, yTrain)
 
-    # Plot the decision boundary. For that, we will assign a color to each
-    # point in the mesh [x_min, m_max]x[y_min, y_max].
     x_min, x_max = Xtrain[:, 0].min() - 1, Xtrain[:, 0].max() + 1
     y_min, y_max = Xtrain[:, 1].min() - 1, Xtrain[:, 1].max() + 1
     xx, yy = np.meshgrid(np.arange(x_min, x_max, h),  np.arange(y_min, y_max, h))
+
+    Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+
+    trace1 = go.Contour(
+        x = np.arange(x_min, x_max, h),
+        y = np.arange(y_min, y_max, h),
+        z = Z.reshape(xx.shape),
+        showscale=False,
+        opacity=0.8,
+        line = dict(
+            width = 1,
+            color = 'black'
+        ),
+        colorscale=[[0, '#AAAAFF'], [1, '#FFAAAA']],  # custom colorscale
+    )
+
+    trace2 = go.Scatter(
+        x = XTest[yTest == 0,0],
+        y = XTest[yTest == 0,1],
+        mode = 'markers',
+        marker = Marker(
+            color = '#0000FF',
+            line = dict(
+                width = 0.9,
+            )
+        ),
+        name = 'high quality (test)'
+    )
+
+    trace3 = go.Scatter(
+        x = XTest[yTest == 1,0],
+        y = XTest[yTest == 1,1],
+        mode = 'markers',
+        marker = Marker(
+            color = '#FF0000',
+            line = dict(
+                width = 0.9,
+            ),
+            symbol = 4
+        ),
+        name = 'low quality (test)',
+    )
+
+    trace4 = go.Scatter(
+        x = XTrain[yTrain == 1,0],
+        y = XTrain[yTrain == 1,1],
+        mode = 'markers',
+        marker = Marker(
+            color = '#0000FF',
+            line = dict(
+                width = 0.9,
+            )
+        ),
+        name = 'high quality (train)'
+    )
+
+    trace5 = go.Scatter(
+        x = XTrain[yTrain == 1,0],
+        y = XTrain[yTrain == 1,1],
+        mode = 'markers',
+        marker = Marker(
+            color = '#FF0000',
+            line = dict(
+                width = 0.9,
+            ),
+            symbol = 4
+        ),
+        name = 'low quality (train)'
+    )
+
+    layout = go.Layout(
+        title = "2-Class Classification (k = %i, weights = '%s')" % (n_neighbors, weights),
+        xaxis = dict(title = header[0]),
+        yaxis = dict(title = header[1]),
+        showlegend=True,
+        autosize=False,
+        width=700,
+        height=500,
+        margin=Margin(
+            l=50,
+            r=50,
+            b=100,
+            t=50,
+            pad=4
+        ),
+    )
+
+    data = [trace1, trace2, trace3, trace4, trace5]
+    fig = dict(data=data, layout=layout)
+
+    iplot(fig)
+
+
+def dtDecisionPlot(XTrain, yTrain, XTest, yTest, header, max_depth=10):
+    Xtrain = XTrain[:, :2]
+    h = .02  # step size in the mesh
+
+    clf = DecisionTreeClassifier(max_depth=max_depth)
+    clf.fit(Xtrain, yTrain)
+
+    x_min, x_max = Xtrain[:, 0].min() - 1, Xtrain[:, 0].max() + 1
+    y_min, y_max = Xtrain[:, 1].min() - 1, Xtrain[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),  np.arange(y_min, y_max, h))
+
     Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
     # Put the result into a color plot
-    Z = Z.reshape(xx.shape)
-    
-    plt.pcolormesh(xx, yy, Z, cmap = cmap_light)
-    plt.scatter(XTest[:, 0], XTest[:, 1], c = yTest, cmap = cmap_bold)
-    plt.contour(xx, yy, Z, colors=['k'], linestyles=['-'], levels=[0])
-    plt.xlim(xx.min(), xx.max())
-    plt.ylim(yy.min(), yy.max())
-    plt.xlabel('fixed_acidity')
-    plt.ylabel('volatile_acidity')
-    plt.title("2-Class classification (k = %i, weights = '%s')" % (n_neighbors, weights))
-    plt.show()
+    # Z = Z.reshape(xx.shape)
 
-def rfDecisionPlot(XTrain, yTrain, XTest, yTest, n_estimators=10):
-    plt.figure(figsize=(7,5))
+    trace1 = go.Contour(
+        x = np.arange(x_min, x_max, h),
+        y = np.arange(y_min, y_max, h),
+        z = Z.reshape(xx.shape),
+        showscale=False,
+        opacity=0.8,
+        xaxis=header[0],
+        yaxis=header[1],
+        line = dict(
+            width = 1,
+            color = 'black'
+        ),
+        colorscale=[[0, '#AAAAFF'], [1, '#FFAAAA']],  # custom colorscale
+    )
+
+    trace2 = go.Scatter(
+        x = XTest[yTest == 0,0],
+        y = XTest[yTest == 0,1],
+        mode = 'markers',
+        marker = Marker(
+            #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
+            color = '#0000FF',
+            line = dict(
+                width = 0.9,
+            )
+            #opacity=0.6
+        ),
+        name = 'high quality (test)'
+    )
+
+    trace3 = go.Scatter(
+        x = XTest[yTest == 1,0],
+        y = XTest[yTest == 1,1],
+        mode = 'markers',
+        marker = Marker(
+            #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
+            color = '#FF0000',
+            line = dict(
+                width = 0.9,
+            ),
+            symbol = 4
+            #opacity=0.6
+        ),
+        name = 'low quality (test)',
+    )
+
+    trace4 = go.Scatter(
+        x = XTrain[yTrain == 1,0],
+        y = XTrain[yTrain == 1,1],
+        mode = 'markers',
+        marker = Marker(
+            #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
+            color = '#0000FF',
+            line = dict(
+                width = 0.9,
+            )
+            #opacity=0.6
+        ),
+        name = 'high quality (train)'
+    )
+
+    trace5 = go.Scatter(
+        x = XTrain[yTrain == 1,0],
+        y = XTrain[yTrain == 1,1],
+        mode = 'markers',
+        marker = Marker(
+            #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
+            color = '#FF0000',
+            line = dict(
+                width = 0.9,
+            ),
+            symbol = 4
+            #opacity=0.6
+        ),
+        name = 'low quality (train)'
+    )
+
+    layout = go.Layout(
+        title = "2-Class classification Decision Trees",
+        xaxis = dict(title = header[0]),
+        yaxis = dict(title = header[1]),
+        showlegend=True,
+        autosize=False,
+        width=700,
+        height=500,
+        margin=Margin(
+            l=50,
+            r=50,
+            b=100,
+            t=50,
+            pad=4
+        ),
+    )
+
+    data = [trace1, trace2, trace3, trace4, trace5]
+
+    fig = dict(data=data, layout=layout)
+    iplot(fig)
+
+
+def rfDecisionPlot(XTrain, yTrain, XTest, yTest, header, n_estimators=10):
+    Xtrain = XTrain[:, :2]
     h = .02  # step size in the mesh
-    Xtrain = XTrain[:, :2] # we only take the first two features.
-
-    # Create color maps
-    cmap_light = ListedColormap(["#AAAAFF", "#AAFFAA", "#FFAAAA"])
-    cmap_bold  = ListedColormap(["#0000FF", "#00FF00", "#FF0000"])
 
     clf = RandomForestClassifier(n_estimators=n_estimators, random_state=1)
     clf.fit(Xtrain, yTrain)
 
-    # Plot the decision boundary. For that, we will assign a color to each
-    # point in the mesh [x_min, m_max]x[y_min, y_max].
     x_min, x_max = Xtrain[:, 0].min() - 1, Xtrain[:, 0].max() + 1
     y_min, y_max = Xtrain[:, 1].min() - 1, Xtrain[:, 1].max() + 1
     xx, yy = np.meshgrid(np.arange(x_min, x_max, h),  np.arange(y_min, y_max, h))
+
     Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
     # Put the result into a color plot
-    Z = Z.reshape(xx.shape)
-    
-    plt.pcolormesh(xx, yy, Z, cmap = cmap_light)
-    plt.scatter(XTest[:, 0], XTest[:, 1], c = yTest, cmap = cmap_bold)
-    plt.contour(xx, yy, Z, colors=['k'], linestyles=['-'], levels=[0])
-    plt.xlim(xx.min(), xx.max())
-    plt.ylim(yy.min(), yy.max())
-    plt.xlabel('fixed_acidity')
-    plt.ylabel('volatile_acidity')
-    plt.title("2-Class classification Random Forests")
-    plt.show()
+    # Z = Z.reshape(xx.shape)
+
+    trace1 = go.Contour(
+        x = np.arange(x_min, x_max, h),
+        y = np.arange(y_min, y_max, h),
+        z = Z.reshape(xx.shape),
+        showscale=False,
+        opacity=0.8,
+        xaxis=header[0],
+        yaxis=header[1],
+        line = dict(
+            width = 1,
+            color = 'black'
+        ),
+        colorscale=[[0, '#AAAAFF'], [1, '#FFAAAA']],  # custom colorscale
+    )
+
+    trace2 = go.Scatter(
+        x = XTest[yTest == 0,0],
+        y = XTest[yTest == 0,1],
+        mode = 'markers',
+        marker = Marker(
+            #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
+            color = '#0000FF',
+            line = dict(
+                width = 0.9,
+            )
+            #opacity=0.6
+        ),
+        name = 'high quality (test)'
+    )
+
+    trace3 = go.Scatter(
+        x = XTest[yTest == 1,0],
+        y = XTest[yTest == 1,1],
+        mode = 'markers',
+        marker = Marker(
+            #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
+            color = '#FF0000',
+            line = dict(
+                width = 0.9,
+            ),
+            symbol = 4
+            #opacity=0.6
+        ),
+        name = 'low quality (test)',
+    )
+
+    trace4 = go.Scatter(
+        x = XTrain[yTrain == 1,0],
+        y = XTrain[yTrain == 1,1],
+        mode = 'markers',
+        marker = Marker(
+            #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
+            color = '#0000FF',
+            line = dict(
+                width = 0.9,
+            )
+            #opacity=0.6
+        ),
+        name = 'high quality (train)'
+    )
+
+    trace5 = go.Scatter(
+        x = XTrain[yTrain == 1,0],
+        y = XTrain[yTrain == 1,1],
+        mode = 'markers',
+        marker = Marker(
+            #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
+            color = '#FF0000',
+            line = dict(
+                width = 0.9,
+            ),
+            symbol = 4
+            #opacity=0.6
+        ),
+        name = 'low quality (train)'
+    )
+
+    layout = go.Layout(
+        title = "2-Class classification Random Forests",
+        xaxis = dict(title = header[0]),
+        yaxis = dict(title = header[1]),
+        showlegend=True,
+        autosize=False,
+        width=700,
+        height=500,
+        margin=Margin(
+            l=50,
+            r=50,
+            b=100,
+            t=100,
+            pad=4
+        ),
+    )
+
+    data = [trace1, trace2, trace3, trace4, trace5]
+
+    fig = dict(data=data, layout=layout)
+    iplot(fig)
+
 
 def rfAvgAcc(rfModel, XTest, yTest):
     preds = []
@@ -82,7 +356,6 @@ def rfAvgAcc(rfModel, XTest, yTest):
         else:
             df = np.vstack((df,predTree))
 
-
     for j in np.arange(df.shape[0]):
         j=j+1
         mv = []
@@ -92,12 +365,31 @@ def rfAvgAcc(rfModel, XTest, yTest):
             mv.append(values[ind].astype(int))
         avgPred.append(metrics.accuracy_score(yTest, mv))
 
-    plt.figure(figsize=(10, 5))
-    plt.plot(avgPred,  '.', linestyle='-', color='c')
-    plt.ylim(min(avgPred)-0.04, max(avgPred)+0.04)
-    plt.xlabel("Number of trees")
-    plt.ylabel("Accuracy")
-    plt.grid()
-    plt.show()
+    trace = go.Scatter(
+        y=avgPred,
+        x=np.arange(df.shape[0]),
+        mode='markers+lines',
+        name = "Ensemble accuracy trend"
+    )
 
+    layout = go.Layout(
+        title = "Ensemble accuracy over increasing number of trees",
+        xaxis = dict(title = "Number of trees", nticks = 15),
+        yaxis = dict(title = "Accuracy"),
+        showlegend=False,
+        autosize=False,
+        width=1000,
+        height=500,
+        margin=Margin(
+            l=70,
+            r=50,
+            b=100,
+            t=50,
+            pad=4
+        ),
+    )
 
+    data = [trace]
+
+    fig = dict(data=data, layout=layout)
+    iplot(fig)
