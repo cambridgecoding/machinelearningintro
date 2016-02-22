@@ -46,7 +46,7 @@ Clone the code from your own repository.
 
 ## Finalise the setup
 
-Open and run the "[load_libraries.ipynb](https://github.com/cambridgecoding/machinelearningbootcamp/blob/master/load_libraries.ipynb)" file, wait for the pre-fetching of the CIFAR10 dataset to be completed (it may take a while but a progress bar will show you the remaining time) and check whether the libraries have been successfully loaded.
+Open and run the "[load_libraries.ipynb](https://github.com/cambridgecoding/machinelearningbootcamp/blob/master/load_libraries.ipynb)" file, and check whether the libraries have been successfully loaded.
 
 To execute the notebook, in your terminal run:
 
