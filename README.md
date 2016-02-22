@@ -35,9 +35,9 @@ Sign up for a GitHub account or sign in if you have one: [github.com](https://gi
 
 ## Fork the code
 
-Fork the CCA bootcamp repository at:
+Fork the CCA Machine Learning Intro Repository at:
 
-[https://github.com/cambridgecoding/machinelearningbootcamp.git](https://github.com/cambridgecoding/machinelearningbootcamp.git)
+[https://github.com/cambridgecoding/machinelearningintro](https://github.com/cambridgecoding/machinelearningintro)
 
 ## Clone the code
 
