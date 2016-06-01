@@ -1,18 +1,18 @@
-# Machine Learning Bootcamp Setup Instructions
+# Introduction to Machine Learning Setup Instructions
 
 ## Install Python
 
-Install Anaconda (Python 2.7) from:  [https://www.continuum.io/downloads](https://www.continuum.io/downloads)
+Install Anaconda (**Python 2.7**) from:  [https://www.continuum.io/downloads](https://www.continuum.io/downloads)
 This includes python 2.7.9 and the necessary libraries we will be using: "numpy", "matplotlib", "scipy" and "scikit-learn"
 
-## Install Packages
+## Install Packages with pip
 
 Installing required packages using "pip"
 
-Open your terminal and check whether you have the "pip" function installed by typing pip (and enter)
+Open your terminal and check whether you have the "pip" function installed by typing pip (and enter).
 If you do not have pip installed, check the link: [https://pip.pypa.io/en/latest/installing/](https://pip.pypa.io/en/latest/installing/) (If installing via the terminal/command line, ensure you are in the directory where you have downloaded the file "get-pip" or if using chrome right-click on the link to download, save to desktop, and simply double click on the executable).
 
-You may need to use `sudo pip install` (for OSX, *nix, etc) or run your command shell as Administrator (for Windows) to be able to perform the installation of the folllowing individual packages:
+You may need to use `sudo pip install` (for OSX, *nix, etc) or run your command shell as Administrator (for Windows) to be able to perform the installation of the following individual packages:
 
     (sudo) pip install Plotly
 
@@ -33,20 +33,18 @@ Install git if you don't have it: [http://git-scm.com/](http://git-scm.com/)
 Sign up for a GitHub account or sign in if you have one: [github.com](https://github.com)
 
 
-## Fork the code
+## Clone or download the code from the CCA GitHub repository
 
-Fork the CCA Machine Learning Intro Repository at:
+You can create a copy of the provided code on your local machine by using the "git clone" command on your console: 
 
-[https://github.com/cambridgecoding/machinelearningintro](https://github.com/cambridgecoding/machinelearningintro)
+    git clone https://github.com/cambridgecoding/machinelearningintro.git
 
-## Clone the code
-
-Clone the code from your own repository.
+Alternatively, click on the "Download ZIP" button under [https://github.com/cambridgecoding/machinelearningintro](https://github.com/cambridgecoding/machinelearningintro)
 
 
 ## Finalise the setup
 
-Open and run the "[load_libraries.ipynb](https://github.com/cambridgecoding/machinelearningbootcamp/blob/master/load_libraries.ipynb)" file, and check whether the libraries have been successfully loaded.
+Open and run the "[load_libraries.ipynb](https://github.com/cambridgecoding/machinelearningintro/blob/master/load_libraries.ipynb)" file, and check whether the libraries have been successfully loaded.
 
 To execute the notebook, in your terminal run:
 
