@@ -49,3 +49,9 @@ Open and run the "[load_libraries.ipynb](https://github.com/cambridgecoding/mach
 To execute the notebook, in your terminal run:
 
     ipython notebook load_libraries.ipynb
+
+* You can run the notebook document step-by-step (one cell a time) by pressing **shift + enter**.
+* You can run the whole notebook in a single step by clicking on the menu Cell -> Run All.
+* To restart the kernel (i.e. the computational engine), click on the menu Kernel -> Restart. This can be useful to start over a computation from scratch (e.g. variables are deleted, open files are closed, etc...).
+* Click on the menu Help -> User Interface Tour for an overview of the Jupyter Notebook App user interface.
+

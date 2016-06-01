@@ -1,5 +1,5 @@
 import numpy as np
-import plotly.graph_objs as go
+import plotly.graph_objs as go 
 
 from plotly.graph_objs import *
 from plotly.offline import download_plotlyjs, init_notebook_mode, iplot
@@ -8,6 +8,28 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
 
+def knn_organise_scores(grid_cv_scores, n_neighbors, weights):
+    scores = np.zeros((len(n_neighbors), len(weights)))
+
+    # grid_scores_ contains parameter settings and scores
+    for score in grid_cv_scores:
+        ne = score[0]['n_neighbors']
+        i = np.argmax(n_neighbors == ne)
+        j = 0 if (score[0]['weights'] == 'uniform') else 1
+        scores[i,j] = score[1]
+    return scores
+
+def rf_organise_scores(grid_cv_scores, n_estimators, max_depth):
+    # reorganisig the scores in a matrix
+    scores = np.zeros((len(n_estimators), len(max_depth)))
+
+    for score in grid_cv_scores:
+        ne = score[0]['n_estimators']
+        md = score[0]['max_depth']
+        i = np.argmax(n_estimators == ne)
+        j = np.argmax(max_depth == md)
+        scores[i,j] = score[1]
+    return scores
 
 def knnDecisionPlot(XTrain, yTrain, XTest, yTest, header, n_neighbors, weights = "uniform"):
     Xtrain = XTrain[:, :2]
@@ -29,10 +51,10 @@ def knnDecisionPlot(XTrain, yTrain, XTest, yTest, header, n_neighbors, weights =
         showscale=False,
         opacity=0.8,
         line = dict(
-            width = 1,
+            width = 1.5,
             color = 'black'
         ),
-        colorscale=[[0, '#AAAAFF'], [1, '#FFAAAA']],  # custom colorscale
+        colorscale=[[0, '#1976d2'], [1, '#ffcc80']],  # custom colorscale
     )
 
     trace2 = go.Scatter(
@@ -40,7 +62,7 @@ def knnDecisionPlot(XTrain, yTrain, XTest, yTest, header, n_neighbors, weights =
         y = XTest[yTest == 0,1],
         mode = 'markers',
         marker = Marker(
-            color = '#0000FF',
+            color = 'blue',
             line = dict(
                 width = 0.9,
             )
@@ -53,7 +75,7 @@ def knnDecisionPlot(XTrain, yTrain, XTest, yTest, header, n_neighbors, weights =
         y = XTest[yTest == 1,1],
         mode = 'markers',
         marker = Marker(
-            color = '#FF0000',
+            color = 'orange',
             line = dict(
                 width = 0.9,
             ),
@@ -63,11 +85,11 @@ def knnDecisionPlot(XTrain, yTrain, XTest, yTest, header, n_neighbors, weights =
     )
 
     trace4 = go.Scatter(
-        x = XTrain[yTrain == 1,0],
-        y = XTrain[yTrain == 1,1],
+        x = XTrain[yTrain == 0,0],
+        y = XTrain[yTrain == 0,1],
         mode = 'markers',
         marker = Marker(
-            color = '#0000FF',
+            color = 'blue',
             line = dict(
                 width = 0.9,
             )
@@ -80,7 +102,7 @@ def knnDecisionPlot(XTrain, yTrain, XTest, yTest, header, n_neighbors, weights =
         y = XTrain[yTrain == 1,1],
         mode = 'markers',
         marker = Marker(
-            color = '#FF0000',
+            color = 'orange',
             line = dict(
                 width = 0.9,
             ),
@@ -139,7 +161,7 @@ def dtDecisionPlot(XTrain, yTrain, XTest, yTest, header, max_depth=10):
             width = 1,
             color = 'black'
         ),
-        colorscale=[[0, '#AAAAFF'], [1, '#FFAAAA']],  # custom colorscale
+        colorscale=[[0, '#1976d2'], [1, '#ffcc80']],  # custom colorscale
     )
 
     trace2 = go.Scatter(
@@ -148,7 +170,7 @@ def dtDecisionPlot(XTrain, yTrain, XTest, yTest, header, max_depth=10):
         mode = 'markers',
         marker = Marker(
             #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
-            color = '#0000FF',
+            color = 'blue',
             line = dict(
                 width = 0.9,
             )
@@ -163,7 +185,7 @@ def dtDecisionPlot(XTrain, yTrain, XTest, yTest, header, max_depth=10):
         mode = 'markers',
         marker = Marker(
             #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
-            color = '#FF0000',
+            color = 'orange',
             line = dict(
                 width = 0.9,
             ),
@@ -174,12 +196,12 @@ def dtDecisionPlot(XTrain, yTrain, XTest, yTest, header, max_depth=10):
     )
 
     trace4 = go.Scatter(
-        x = XTrain[yTrain == 1,0],
-        y = XTrain[yTrain == 1,1],
+        x = XTrain[yTrain == 0,0],
+        y = XTrain[yTrain == 0,1],
         mode = 'markers',
         marker = Marker(
             #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
-            color = '#0000FF',
+            color = 'blue',
             line = dict(
                 width = 0.9,
             )
@@ -194,7 +216,7 @@ def dtDecisionPlot(XTrain, yTrain, XTest, yTest, header, max_depth=10):
         mode = 'markers',
         marker = Marker(
             #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
-            color = '#FF0000',
+            color = 'orange',
             line = dict(
                 width = 0.9,
             ),
@@ -254,7 +276,7 @@ def rfDecisionPlot(XTrain, yTrain, XTest, yTest, header, n_estimators=10):
             width = 1,
             color = 'black'
         ),
-        colorscale=[[0, '#AAAAFF'], [1, '#FFAAAA']],  # custom colorscale
+        colorscale=[[0, '#1976d2'], [1, '#ffcc80']],  # custom colorscale
     )
 
     trace2 = go.Scatter(
@@ -263,7 +285,7 @@ def rfDecisionPlot(XTrain, yTrain, XTest, yTest, header, n_estimators=10):
         mode = 'markers',
         marker = Marker(
             #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
-            color = '#0000FF',
+            color = 'blue',
             line = dict(
                 width = 0.9,
             )
@@ -278,7 +300,7 @@ def rfDecisionPlot(XTrain, yTrain, XTest, yTest, header, n_estimators=10):
         mode = 'markers',
         marker = Marker(
             #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
-            color = '#FF0000',
+            color = 'orange',
             line = dict(
                 width = 0.9,
             ),
@@ -289,12 +311,12 @@ def rfDecisionPlot(XTrain, yTrain, XTest, yTest, header, n_estimators=10):
     )
 
     trace4 = go.Scatter(
-        x = XTrain[yTrain == 1,0],
-        y = XTrain[yTrain == 1,1],
+        x = XTrain[yTrain == 0,0],
+        y = XTrain[yTrain == 0,1],
         mode = 'markers',
         marker = Marker(
             #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
-            color = '#0000FF',
+            color = 'blue',
             line = dict(
                 width = 0.9,
             )
@@ -309,7 +331,7 @@ def rfDecisionPlot(XTrain, yTrain, XTest, yTest, header, n_estimators=10):
         mode = 'markers',
         marker = Marker(
             #color = [('#0000FF' if i == 0 else '#FF0000') for i in yTest],
-            color = '#FF0000',
+            color = 'orange',
             line = dict(
                 width = 0.9,
             ),
