@@ -1,4 +1,4 @@
-# Introduction to Machine Learning Setup Instructions
+# Machine Learning Setup Instructions
 
 ## Install Python
 
