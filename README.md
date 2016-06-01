@@ -3,7 +3,7 @@
 ## Install Python
 
 Install Anaconda (**Python 2.7**) from:  [https://www.continuum.io/downloads](https://www.continuum.io/downloads)
-This includes python 2.7.9 and the necessary libraries we will be using: "numpy", "matplotlib", "scipy" and "scikit-learn"
+This includes python 2.7.9 and the necessary libraries we will be using: "numpy", "scipy" and "scikit-learn"
 
 ## Install Packages with pip
 
